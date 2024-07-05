@@ -1,4 +1,5 @@
 export interface ToDoItemInterface {
-  name: string;
-  complete: boolean;
+  id: string
+  name: string
+  complete: boolean
 }

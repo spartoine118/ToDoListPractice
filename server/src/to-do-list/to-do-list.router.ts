@@ -1,5 +1,8 @@
-import * as express from "express";
+import * as express from "express"
+import { mockToDoItems } from "./mock/todoitems.mock"
 
-const router = express.Router();
+export const toDoListRouter = express.Router()
 
-router.get();
+toDoListRouter.get("/", (req, res) => {
+  res.send(mockToDoItems)
+})
