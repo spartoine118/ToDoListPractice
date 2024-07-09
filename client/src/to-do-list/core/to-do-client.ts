@@ -2,11 +2,18 @@ import { ToDoItemInterface } from "./interfaces/item.interface"
 import axios, { AxiosInstance } from "axios"
 
 export class ToDoClient {
-  // TODO Change typing here
   constructor(readonly http: AxiosInstance) {}
 
   async getToDo(): Promise<ToDoItemInterface[]> {
     const { data } = await this.http.get<ToDoItemInterface[]>("/")
+
+    return data
+  }
+
+  async updateToDo(updated: ToDoItemInterface): Promise<ToDoItemInterface> {
+    const { data } = await this.http.put<ToDoItemInterface>("/", {
+      data: updated,
+    })
 
     return data
   }

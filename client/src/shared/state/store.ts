@@ -78,7 +78,9 @@ class Store {
 
 export const store = new Store(reducers)
 
-export function useSelector(fn?: any): GlobalState {
+export function useSelector<T extends (...args: any[]) => any>(
+  fn?: T
+): ReturnType<T> {
   const storeRef = useRef(store)
   const [state, setState] = useState<GlobalState>(store.getState())
 

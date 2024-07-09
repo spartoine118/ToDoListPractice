@@ -5,6 +5,9 @@ export enum ToDoEvents {
   GET_TODO = "GET_TODO",
   GET_TODO_SUCCESS = "GET_TODO_SUCCESS",
   GET_TODO_FAIL = "GET_TODO_FAIL",
+  UPDATE_TODO = "UPDATE_TODO",
+  UPDATE_TODO_SUCCESS = "UPDATE_TODO_SUCCESS",
+  UPDATE_TODO_FAIL = "UPDATE_TODO_FAIL",
 }
 
 export class GetToDo implements Action {
@@ -30,5 +33,31 @@ export class GetToDoFail implements Action {
 
   constructor(readonly payload: ActionFailedPayload) {}
 }
+export class UpdateToDo implements Action {
+  type = ToDoEvents.UPDATE_TODO
+  payload = {}
+}
 
-export type ToDoActions = GetToDo | GetToDoFail | GetToDoSuccess
+export interface UpdateToDoSuccessPayload {
+  updated: ToDoItemInterface
+}
+
+export class UpdateToDoSuccess implements Action {
+  type = ToDoEvents.UPDATE_TODO_SUCCESS
+
+  constructor(readonly payload: UpdateToDoSuccessPayload) {}
+}
+
+export class UpdateToDoFail implements Action {
+  type = ToDoEvents.UPDATE_TODO_FAIL
+
+  constructor(readonly payload: ActionFailedPayload) {}
+}
+
+export type ToDoActions =
+  | GetToDo
+  | GetToDoFail
+  | GetToDoSuccess
+  | UpdateToDo
+  | UpdateToDoSuccess
+  | UpdateToDoFail

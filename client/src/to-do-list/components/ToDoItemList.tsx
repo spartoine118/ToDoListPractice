@@ -3,11 +3,17 @@ import { mockToDoItems } from "../core/mock/mock-data"
 import { ToDoItem } from "./ToDoItem"
 import styled from "styled-components"
 import { store, useDispatch, useSelector } from "../../shared/state/store"
-import { selectToDoEntities, selectToDoState } from "../state/to-do-reducer"
+import {
+  selectToDoEntities,
+  selectToDoLoading,
+  selectToDoState,
+} from "../state/to-do-reducer"
 import { getToDoThunk } from "../state/to-do-thunks"
+import { Loader } from "../../shared/components/loader"
 
 export function ToDoItemList() {
-  const data = useSelector(selectToDoEntities)
+  const entities = useSelector(selectToDoEntities)
+  const loading = useSelector(selectToDoLoading)
   // TODO try and make dispatch work correctly
   const dispatch = useDispatch
 
@@ -17,9 +23,11 @@ export function ToDoItemList() {
 
   return (
     <Container>
-      {mockToDoItems.map((item) => (
-        <ToDoItem key={item.id} item={item} />
-      ))}
+      <Loader loading={loading}>
+        {Object.values(entities).map((item) => (
+          <ToDoItem key={item.id} item={item} />
+        ))}
+      </Loader>
     </Container>
   )
 }

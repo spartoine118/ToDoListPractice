@@ -1,9 +1,13 @@
 import { Action } from "../../shared/state/actions"
 import { ToDoItemInterface } from "../core/interfaces/item.interface"
-import { GetToDoSuccessPayload, ToDoEvents } from "./to-do-actions"
+import {
+  GetToDoSuccessPayload,
+  ToDoEvents,
+  UpdateToDoSuccessPayload,
+} from "./to-do-actions"
 
 export interface ToDoState {
-  entities: Omit<ToDoItemInterface, "id">[]
+  entities: Record<string, ToDoItemInterface>
   ids: string[]
   loading: boolean
   error: string
@@ -16,7 +20,7 @@ interface PartialToDoState {
 }
 
 export const toDoInitialState: ToDoState = {
-  entities: [],
+  entities: {},
   ids: [],
   loading: false,
   error: "",
@@ -43,8 +47,11 @@ export function toDoReducer(
     case ToDoEvents.GET_TODO_SUCCESS: {
       const payload = action.payload as GetToDoSuccessPayload
 
-      const ids = payload.toDoItems.map((val) => val.id)
-      const entities = payload.toDoItems.map(({ id, ...val }) => val)
+      const dictionary = Object.fromEntries(
+        payload.toDoItems.map((val) => [val.id, val])
+      )
+      const entities = Object.values(dictionary)
+      const ids = Object.keys(dictionary)
 
       const newState: PartialToDoState = {
         ...state,
@@ -53,7 +60,7 @@ export function toDoReducer(
           loading: false,
           error: "",
           ids,
-          entities,
+          entities: dictionary,
         },
       }
 
@@ -61,6 +68,57 @@ export function toDoReducer(
     }
 
     case ToDoEvents.GET_TODO_FAIL: {
+      const newState: PartialToDoState = {
+        ...state,
+        TO_DO: {
+          ...state[TO_DO_STATE_KEY],
+          error: JSON.stringify(action.payload),
+          loading: false,
+        },
+      }
+
+      return newState
+    }
+
+    case ToDoEvents.UPDATE_TODO: {
+      const newState: PartialToDoState = {
+        ...state,
+        TO_DO: {
+          ...state[TO_DO_STATE_KEY],
+          loading: true,
+          error: "",
+        },
+      }
+
+      return newState
+    }
+
+    case ToDoEvents.UPDATE_TODO_SUCCESS: {
+      const payload = action.payload as UpdateToDoSuccessPayload
+
+      const newEntities = state[TO_DO_STATE_KEY].entities
+
+      newEntities[payload.updated.id] = payload.updated
+
+      console.log(
+        `Original State Entities: ${JSON.stringify(state[TO_DO_STATE_KEY].entities)}`
+      )
+      console.log(`New State Entities: ${JSON.stringify(newEntities)}`)
+
+      const newState: PartialToDoState = {
+        ...state,
+        TO_DO: {
+          ...state[TO_DO_STATE_KEY],
+          loading: false,
+          error: "",
+          entities: newEntities,
+        },
+      }
+
+      return newState
+    }
+
+    case ToDoEvents.UPDATE_TODO_FAIL: {
       const newState: PartialToDoState = {
         ...state,
         TO_DO: {
