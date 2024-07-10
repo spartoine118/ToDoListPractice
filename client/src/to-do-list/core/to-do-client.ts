@@ -11,9 +11,7 @@ export class ToDoClient {
   }
 
   async updateToDo(updated: ToDoItemInterface): Promise<ToDoItemInterface> {
-    const { data } = await this.http.put<ToDoItemInterface>("/", {
-      data: updated,
-    })
+    const { data } = await this.http.put<ToDoItemInterface>("/", updated)
 
     return data
   }

@@ -1,8 +1,4 @@
-export interface ToDoItemInterface {
-  id: string
-  name: string
-  complete: boolean
-}
+import { ToDoItemInterface } from "../interfaces/todo-item.interface"
 
 export const mockToDoItems: ToDoItemInterface[] = [
   { id: "1", name: "Item 1", complete: false },
