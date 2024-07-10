@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { mockToDoItems } from "../core/mock/mock-data"
 import { ToDoItem } from "./ToDoItem"
 import styled from "styled-components"
-import { store, useDispatch, useSelector } from "../../shared/state/store"
+import { store, useSelector } from "../../shared/state/store"
 import {
   selectToDoEntities,
   selectToDoLoading,
@@ -14,8 +14,6 @@ import { Loader } from "../../shared/components/loader"
 export function ToDoItemList() {
   const entities = useSelector(selectToDoEntities)
   const loading = useSelector(selectToDoLoading)
-  // TODO try and make dispatch work correctly
-  const dispatch = useDispatch
 
   useEffect(() => {
     getToDoThunk()

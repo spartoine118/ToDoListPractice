@@ -93,11 +93,3 @@ export function useSelector<T extends (...args: any[]) => any>(
   const result = fn ? fn(state) : state
   return result
 }
-
-export function useDispatch(action: any): (action: Action) => void {
-  const dispatch =
-    typeof action === "function"
-      ? useCallback(action, [])
-      : useCallback((action: Action) => store.dispatch(action), [])
-  return dispatch
-}
