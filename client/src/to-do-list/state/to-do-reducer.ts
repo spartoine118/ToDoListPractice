@@ -100,11 +100,6 @@ export function toDoReducer(
 
       newEntities[payload.updated.id] = payload.updated
 
-      console.log(
-        `Original State Entities: ${JSON.stringify(state[TO_DO_STATE_KEY].entities)}`
-      )
-      console.log(`New State Entities: ${JSON.stringify(newEntities)}`)
-
       const newState: PartialToDoState = {
         ...state,
         TO_DO: {
