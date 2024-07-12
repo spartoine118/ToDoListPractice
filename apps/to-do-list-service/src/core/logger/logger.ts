@@ -4,7 +4,7 @@ type Level = "info" | "error" | "debug"
 
 export function logger(message: string, level: Level = "info") {
   const timeStamp = new Date().toISOString()
-  console.log(`{ Date: ${timeStamp}\nLevel: ${level}\nmessage: ${message} }`)
+  console.log(`{\nDate: ${timeStamp}\nLevel: ${level}\nmessage: ${message}\n}`)
 }
 
 export const loggerExpressMiddleware = () => {
