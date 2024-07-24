@@ -18,6 +18,6 @@ export class ToDoClient {
 }
 
 // TODO Change this to an env var later
-const http = axios.create({ baseURL: "http://localhost:3000/to-do-list" })
+const http = axios.create({ baseURL: "http://localhost:3001/to-do-list" })
 
 export const toDoClient = new ToDoClient(http)

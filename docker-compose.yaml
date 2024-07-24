@@ -1,0 +1,33 @@
+name: todo-practice
+
+services:
+  frontend-client:
+      ports:
+        - "4200:4200"
+      build: ./apps/client/
+
+  to-do-list:
+    build: ./apps/to-do-list-service/
+    ports:
+      - "3001:3001"
+    depends_on:
+      - to-do-list-db
+    
+
+  to-do-list-db:
+    image: mysql:lts  
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mydb
+    ports:
+      - 3306:3306
+    volumes:
+      - to-do-list-volume:/var/lib/mysql
+
+  api-gateway:
+    ports:
+      - "3000:3000"
+    build: ./apps/api-gateway
+
+volumes:
+  to-do-list-volume:

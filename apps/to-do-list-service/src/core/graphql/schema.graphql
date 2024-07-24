@@ -1,9 +1,0 @@
-type ToDoItem {
-  id: ID!
-  name: String
-  complete: Boolean
-}
-
-type Query {
-  toDoItems: [ToDoItem!]!
-}

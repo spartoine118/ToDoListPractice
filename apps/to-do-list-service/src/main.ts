@@ -1,7 +1,11 @@
+import { setupDatabase } from "./core/mysql-db/db-setup"
 import { app } from "./server"
 
-const port = 3000
+// TODO change this to env var
+const port = 3001
 
-app.listen(port, () => {
+app.listen(port, async () => {
+  console.log("Setting up database")
+  setupDatabase()
   console.log(`Example app listening on port ${port}`)
 })
