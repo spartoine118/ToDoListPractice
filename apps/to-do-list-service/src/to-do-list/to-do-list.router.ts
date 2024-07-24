@@ -5,7 +5,6 @@ import { ToDoItemInterface } from "./interfaces/todo-item.interface"
 export const toDoListRouter = express.Router()
 
 toDoListRouter.get("/", (req, res) => {
-  console.log(req.baseUrl)
   res.send(mockToDoItems)
 })
 

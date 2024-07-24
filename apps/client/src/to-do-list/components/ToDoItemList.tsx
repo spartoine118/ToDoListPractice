@@ -5,27 +5,14 @@ import { useSelector } from "../../shared/state/store"
 import { selectToDoEntities, selectToDoLoading } from "../state/to-do-reducer"
 import { getToDoThunk } from "../state/to-do-thunks"
 import { Loader } from "../../shared/components/loader"
-import { gql, useQuery } from "@apollo/client"
-
-const GET_TO_DOS = gql`
-  query toDoItems {
-    toDoItems {
-      name
-      id
-      complete
-    }
-  }
-`
 
 export function ToDoItemList() {
   const entities = useSelector(selectToDoEntities)
   const loading = useSelector(selectToDoLoading)
 
-  const { error, data } = useQuery(GET_TO_DOS)
-
   useEffect(() => {
-    console.log(data)
-  }, [data])
+    getToDoThunk()
+  }, [])
 
   return (
     <Container>

@@ -11,4 +11,14 @@ export const typeDefs = gql`
     toDoItem(id: ID!): ToDoItem
     toDoItems: [ToDoItem!]!
   }
+
+  input UpdateToDoItem {
+    id: ID!
+    name: String!
+    complete: Boolean!
+  }
+
+  type Mutation {
+    updateToDoItem(item: UpdateToDoItem!): ToDoItem
+  }
 `

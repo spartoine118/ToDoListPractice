@@ -7,4 +7,9 @@ export const resolvers = {
       return context.dataSources.toDoListAPI.getToDo()
     },
   },
+  Mutation: {
+    updateToDoItem: (parent, args, context, info) => {
+      return context.dataSources.toDoListAPI.updateToDo(args.item)
+    },
+  },
 }
