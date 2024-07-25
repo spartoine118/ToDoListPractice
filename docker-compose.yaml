@@ -24,10 +24,21 @@ services:
     volumes:
       - to-do-list-volume:/var/lib/mysql
 
+  authentication:
+    build: './apps/authentcation-service'
+    ports:
+      - "3002:3002"
+    depends_on:
+      - authentication-db
+
+  authentication-db:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      -authentication-volume:/var/lib/mongodb
+
   api-gateway:
     ports:
       - "3000:3000"
     build: ./apps/api-gateway
-
-volumes:
-  to-do-list-volume:

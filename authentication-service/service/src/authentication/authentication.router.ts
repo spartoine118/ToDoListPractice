@@ -1,6 +1,8 @@
 import { Router } from "express"
 import jwt from "jsonwebtoken"
-import { authorizedMiddleware } from "./authorization.middleware"
+import { authorizeCookieMiddleware } from "./authorization.middleware"
+import { mongoClient } from "./core/mongodb/db-connection"
+import { User } from "./core/interfaces"
 
 export const authRouter = Router()
 
@@ -13,38 +15,51 @@ interface JWTPayload {
   id: string
 }
 
-authRouter.post("/login", (req, res) => {
-  const data = req.body as JWTPayload
+interface LoginPayload {
+  email: string
+  password: string
+}
 
-  const token = jwt.sign(data.id, "SOME_SECRET_KEY")
+authRouter.post("/login", async (req, res) => {
+  const data = req.body as LoginPayload
 
-  // res
-  //   .cookie("sessionId", token, {
-  //     maxAge: 60 * 15 * 1000,
-  //     expires: new Date(Date.now() + 900000),
-  //     // TODO replace this with an ENV var
-  //     // sameSite: "strict",
-  //     // path: "/",
-  //     // httpOnly: true,
-  //     // domain: "http://localhost:5173",
-  //     // secure: true TODO uncomment this when actual deployment
-  //   })
-  //   .send({ message: "logged in" })
+  const user = await mongoClient
+    .db("auth-db")
+    .collection<User>("user")
+    .findOne(data)
+
+  if (!user) {
+    res.status(404).send({ message: "Incorrect password or email" })
+    return
+  }
+
+  const token = jwt.sign(user._id.toString(), "SOME_SECRET_KEY")
 
   res
-    .cookie("name", "express", {
+    .cookie("JWT", token, {
       httpOnly: true,
-      path: "/",
-      domain: "localhost",
       secure: false,
       sameSite: "lax",
-      maxAge: 3600000,
     })
-    .send({ message: "cookie set" })
+    .send(user)
 })
 
-authRouter.get("/authorized", authorizedMiddleware, (req, res) => {
-  const x = req.cookies as any
-  console.log(JSON.stringify(req.cookies))
-  res.send({ message: "YOU ARE AUTHORIZED" })
+authRouter.get("/authenticate", async (req, res) => {
+  const token = req.cookies.JWT
+
+  if (!token) {
+    res.status(401).send([{ message: "UNAUTHORIZED" }])
+    return
+  }
+
+  const user = await mongoClient
+    .db("auth-db")
+    .collection<User>("user")
+    .findOne(token)
+
+  res.send(user)
+})
+
+authRouter.get("/logout", authorizeCookieMiddleware, (req, res) => {
+  res.clearCookie("JWT")
 })

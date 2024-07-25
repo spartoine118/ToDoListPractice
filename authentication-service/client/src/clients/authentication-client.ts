@@ -16,7 +16,7 @@ export class AuthenticationClient {
       payload
     )
 
-    // this.bearerToken = data.token
+    this.bearerToken = data.token
   }
 
   authorized(): void {
