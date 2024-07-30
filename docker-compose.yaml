@@ -35,6 +35,12 @@ services:
     build: './apps/authentication-service/'
     ports:
       - "3002:3002"
+    environment:
+      - SERVICE_PORT=3002
+      - DB_PORT=27017
+      - DB_PASSWORD=root
+      - DB_USERNAME=root
+      - API_GATEWAY_URI=http://localhost:3000/
     depends_on:
       - authentication-db
 

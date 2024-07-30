@@ -35,7 +35,9 @@ async function startApolloServer() {
       } catch (error) {
         logger(JSON.stringify(error), "error")
 
-        res.send(error)
+        res
+          .header({ "Access-Control-Allow-Origin": req.headers["origin"] })
+          .send(error)
       }
     }
   )

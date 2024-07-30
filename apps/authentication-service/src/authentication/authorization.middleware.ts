@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express"
-import jwt, { JwtPayload } from "jsonwebtoken"
-import { logger } from "./core/logger/logger"
 
 export async function authorizedBearerMiddleware(
   req: Request,

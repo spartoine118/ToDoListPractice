@@ -5,6 +5,7 @@ import { mongoClient } from "./core/mongodb/db-connection"
 import { User } from "./core/interfaces"
 import { ObjectId } from "mongodb"
 import { logger } from "./core/logger/logger"
+import { CollectionName, DatabaseName } from "./core/mongodb/enums"
 
 export const authRouter = Router()
 
@@ -20,8 +21,8 @@ authRouter.post("/login", async (req, res) => {
   const data = req.body as LoginPayload
 
   const user = await mongoClient
-    .db("auth-db")
-    .collection<User>("user")
+    .db(DatabaseName.AUTH_DB)
+    .collection<User>(CollectionName.USER)
     .findOne(data)
 
   if (!user) {
@@ -43,22 +44,20 @@ authRouter.post("/login", async (req, res) => {
     .send(user)
 })
 
-authRouter.get("/authenticate", async (req, res) => {
+authRouter.get("/authenticate", authorizeCookieMiddleware, async (req, res) => {
   const token = req.cookies.JWT
-
-  if (!token) {
-    res.status(401).send([{ message: "UNAUTHORIZED" }])
-    return
-  }
 
   const decrypt = jwt.decode(token) as JWT
 
-  logger(JSON.stringify(decrypt), "info")
-
   const user = await mongoClient
-    .db("auth-db")
-    .collection<User>("user")
+    .db(DatabaseName.AUTH_DB)
+    .collection<User>(CollectionName.USER)
     .findOne({ _id: new ObjectId(decrypt.id) })
+
+  if (!user) {
+    res.status(404).send([{ message: "User not found" }])
+    return
+  }
 
   res.send(user)
 })
