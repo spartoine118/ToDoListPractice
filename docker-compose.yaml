@@ -1,0 +1,52 @@
+name: todo-practice
+
+services:
+  frontend-client:
+      ports:
+        - "4200:4200"
+      build: ./apps/client/
+
+  to-do-list:
+    build: ./apps/to-do-list-service/
+    ports:
+      - "3001:3001"
+    depends_on:
+      - to-do-list-db
+    
+
+  to-do-list-db:
+    image: mysql:lts  
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=mydb
+    ports:
+      - 3306:3306
+    volumes:
+      - sql-volume:/var/lib/mysql
+
+  authentication:
+    build: './apps/authentication-service/'
+    ports:
+      - "3002:3002"
+    depends_on:
+      - authentication-db
+
+  authentication-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=mydb
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - mongo-volumne:/var/lib/mongodb
+
+  api-gateway:
+    ports:
+      - "3000:3000"
+    build: ./apps/api-gateway
+
+volumes:
+  sql-volume:
+  mongo-volumne:
