@@ -1,6 +1,17 @@
 import gql from "graphql-tag"
 
 export const typeDefs = gql`
+  enum Role {
+    ADMIN
+    CUSTOMER
+  }
+
+  type User {
+    _id: ID!
+    email: String!
+    role: Role!
+  }
+
   type ToDoItem {
     id: ID!
     name: String!

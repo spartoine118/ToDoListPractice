@@ -22,7 +22,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - to-do-list-volume:/var/lib/mysql
+      - sql-volume:/var/lib/mysql
 
   authentication:
     build: './apps/authentication-service/'
@@ -32,11 +32,15 @@ services:
       - authentication-db
 
   authentication-db:
-    image: mongo
+    image: mongo:latest
     ports:
-      - 27017:27017
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=mydb
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
     volumes:
-      - authentication-volume:/var/lib/mongodb
+      - mongo-volumne:/var/lib/mongodb
 
   api-gateway:
     ports:
@@ -44,6 +48,5 @@ services:
     build: ./apps/api-gateway
 
 volumes:
-  to-do-list-volume:
-
-  authentication-volume:
+  sql-volume:
+  mongo-volumne:

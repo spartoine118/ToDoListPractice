@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb"
 
-const url = "mongodb://localhost:27017"
+const url = "mongodb://root:root@authentication-db:27017"
 export const mongoClient = new MongoClient(url)
 
 export async function connectMongoDB(): Promise<void> {

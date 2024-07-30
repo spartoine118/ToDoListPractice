@@ -1,7 +1,7 @@
 import { mongoClient } from "./authentication/core/mongodb/db-connection"
 import { app } from "./server"
 
-const port = 3001
+const port = 3002
 
 app.listen(port, () => {
   mongoClient.connect()
