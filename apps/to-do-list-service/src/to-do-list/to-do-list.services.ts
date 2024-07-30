@@ -3,6 +3,7 @@ import { connectDB } from "../core/mysql-db/db-setup"
 import { ToDoItemInterface } from "./interfaces/todo-item.interface"
 import { logger } from "../core/logger/logger"
 import { WithUser } from "../core/interfaces"
+import { TableNames } from "../core/mysql-db/enums"
 
 export async function getToDoItemsByUserId(
   id: string
@@ -31,14 +32,14 @@ export async function getToDoItemById({
   try {
     const conn = await connectDB()
 
-    const query = `SELECT * FROM to_do_items WHERE id = "${id}", userId = "${user._id}";`
+    const query = `SELECT * FROM ${TableNames.TO_DO_ITEMS} WHERE id = "${id}", userId = "${user._id}";`
 
     const results = await conn.query<RowDataPacket[]>(query)
 
     await conn.end()
 
     if (results[0].length !== 1) {
-      throw Error("Error no or multiple toDoItem with the same ID")
+      throw Error("Error zero or multiple toDoItem with the same ID")
     }
 
     return results[0][0] as ToDoItemInterface
@@ -58,14 +59,16 @@ export async function updateToDoItemById({
   try {
     const conn = await connectDB()
 
-    const query = `UPDATE to_do_items SET name = "${updates.name}", complete = ${updates.complete} WHERE id = ${updates.id}, userId = "${user._id}";`
+    const query = `UPDATE ${TableNames.TO_DO_ITEMS} SET name = "${updates.name}", complete = ${updates.complete} WHERE id = ${updates.id}, userId = "${user._id}";`
 
     const results = await conn.query<ResultSetHeader>(query)
 
     await conn.end()
 
     if (!results[0].affectedRows) {
-      throw Error(`Error while updating to_do_item id: ${updates.id}`)
+      throw Error(
+        `Error while updating ${TableNames.TO_DO_ITEMS} id: ${updates.id}`
+      )
     }
 
     return updates
@@ -83,14 +86,14 @@ export async function deleteToDoItemById({
   try {
     const conn = await connectDB()
 
-    const query = `DELETE FROM to_do_items WHERE id = ${id}, userId = "${user._id}";`
+    const query = `DELETE FROM ${TableNames.TO_DO_ITEMS} WHERE id = ${id}, userId = "${user._id}";`
 
     const results = await conn.query<ResultSetHeader>(query)
 
     await conn.end()
 
     if (!results[0].affectedRows) {
-      throw Error(`Error while deleting to_do_item id: ${id}`)
+      throw Error(`Error while deleting ${TableNames.TO_DO_ITEMS} id: ${id}`)
     }
 
     return id
