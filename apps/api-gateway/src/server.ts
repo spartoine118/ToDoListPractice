@@ -24,6 +24,8 @@ async function startApolloServer() {
       try {
         const axiosRes = await authenticationClient.login(req.body)
 
+        logger(`Request Headers Origin: ${JSON.stringify(req.headers.origin)}`)
+
         res
           .header({
             ...axiosRes.headers,
@@ -31,6 +33,8 @@ async function startApolloServer() {
           })
           .send(axiosRes.data)
       } catch (error) {
+        logger(JSON.stringify(error), "error")
+
         res.send(error)
       }
     }
@@ -51,7 +55,11 @@ async function startApolloServer() {
           })
           .send(axiosRes.data)
       } catch (error) {
-        res.send(error)
+        logger(JSON.stringify(error), "error")
+
+        res
+          .header({ "Access-Control-Allow-Origin": req.headers["origin"] })
+          .send(error)
       }
     }
   )
@@ -63,12 +71,7 @@ async function startApolloServer() {
     expressMiddleware(server, {
       context: async ({ req }) => {
         const { cache } = server
-        const user = await authenticationClient
-          .authenticate(req.headers.cookie)
-          .catch((e) => {
-            console.log(JSON.stringify(e))
-            return null
-          })
+        const user = await authenticationClient.authenticate(req.headers.cookie)
 
         if (!user)
           throw new GraphQLError("User is not authenticated", {

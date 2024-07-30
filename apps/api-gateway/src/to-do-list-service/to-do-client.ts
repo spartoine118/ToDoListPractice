@@ -1,3 +1,4 @@
+import { User } from "../authentication-proxy/interfaces"
 import { ToDoItemInterface } from "./interfaces"
 import { RESTDataSource } from "@apollo/datasource-rest"
 
@@ -7,6 +8,14 @@ export class ToDoListAPI extends RESTDataSource {
 
   async getToDos(): Promise<ToDoItemInterface[]> {
     const data = await this.get<ToDoItemInterface[]>("/to-do-list")
+
+    return data
+  }
+
+  async getToDosByUser(user: User): Promise<ToDoItemInterface[]> {
+    const data = await this.post<ToDoItemInterface[]>("/to-do-list", {
+      body: { user },
+    })
 
     return data
   }

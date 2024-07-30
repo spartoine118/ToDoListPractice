@@ -11,7 +11,8 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - to-do-list-db
+      to-do-list-db:
+        condition: service_healthy
     
 
   to-do-list-db:
@@ -23,6 +24,12 @@ services:
       - 3306:3306
     volumes:
       - sql-volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin -u root -proot ping"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   authentication:
     build: './apps/authentication-service/'

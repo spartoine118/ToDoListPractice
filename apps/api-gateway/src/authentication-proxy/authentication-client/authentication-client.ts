@@ -19,8 +19,8 @@ export class AuthenticationClient {
     return data
   }
 
-  async logout(headers: any) {
-    const data = await this.http.get("/logout", { headers })
+  async logout(cookie: any) {
+    const data = await this.http.get("/logout", { headers: { cookie } })
 
     return data
   }

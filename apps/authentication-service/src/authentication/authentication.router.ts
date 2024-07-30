@@ -4,6 +4,7 @@ import { authorizeCookieMiddleware } from "./authorization.middleware"
 import { mongoClient } from "./core/mongodb/db-connection"
 import { User } from "./core/interfaces"
 import { ObjectId } from "mongodb"
+import { logger } from "./core/logger/logger"
 
 export const authRouter = Router()
 
@@ -43,13 +44,7 @@ authRouter.post("/login", async (req, res) => {
 })
 
 authRouter.get("/authenticate", async (req, res) => {
-  console.log("In authentication service /authenticate route")
-  console.log(req.headers)
-  console.log(req.cookies)
-
   const token = req.cookies.JWT
-
-  console.log(token)
 
   if (!token) {
     res.status(401).send([{ message: "UNAUTHORIZED" }])
@@ -58,7 +53,7 @@ authRouter.get("/authenticate", async (req, res) => {
 
   const decrypt = jwt.decode(token) as JWT
 
-  console.log(decrypt)
+  logger(JSON.stringify(decrypt), "info")
 
   const user = await mongoClient
     .db("auth-db")

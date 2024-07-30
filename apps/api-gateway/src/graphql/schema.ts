@@ -21,6 +21,7 @@ export const typeDefs = gql`
   type Query {
     toDoItem(id: ID!): ToDoItem
     toDoItems: [ToDoItem!]!
+    toDoItemsByUser: [ToDoItem!]!
   }
 
   input UpdateToDoItem {

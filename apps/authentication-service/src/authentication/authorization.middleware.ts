@@ -14,10 +14,6 @@ export async function authorizedBearerMiddleware(
     return
   }
 
-  if (token) {
-    console.log(JSON.stringify(token))
-  }
-
   next()
 }
 
@@ -31,11 +27,6 @@ export async function authorizeCookieMiddleware(
   if (!token) {
     res.status(401).send([{ message: "UNAUTHORIZED" }])
     return
-  }
-
-  if (token) {
-    const decrypt = jwt.decode(token) as JwtPayload
-    logger(JSON.stringify(decrypt), "info")
   }
 
   next()
