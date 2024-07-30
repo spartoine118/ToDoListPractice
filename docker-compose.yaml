@@ -10,6 +10,11 @@ services:
     build: ./apps/to-do-list-service/
     ports:
       - "3001:3001"
+    environment:
+      - DB_PORT=3306
+      - DB_PASSWORD=root
+      - DB_USERNAME=root
+      - SERVICE_PORT=3001
     depends_on:
       to-do-list-db:
         condition: service_healthy
