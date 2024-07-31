@@ -1,31 +1,15 @@
 import mysql from "mysql2/promise"
 import { logger } from "../logger/logger"
-import { DatabaseName, TableNames } from "./enums"
+import { TableNames } from "./enums"
+import { dbConn } from "./db-conn"
 
-export async function connectDB(): Promise<mysql.Connection> {
-  logger("connecting to db", "info")
+export async function setupDatabase(): Promise<void> {
   try {
-    return await mysql.createConnection({
-      decimalNumbers: true,
-      host: "to-do-list-db",
-      port: parseInt(process.env.DB_PORT ?? "3306"),
-      password: process.env.DB_PASSWORD,
-      user: process.env.DB_USERNAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-      database: DatabaseName.MYDB,
-    })
-  } catch (error) {
-    setTimeout(() => undefined, 5000)
-    return await connectDB()
-  }
-}
+    const conn = await dbConn.getConnection()
 
-export async function setupDatabase(conn: mysql.Connection): Promise<void> {
-  try {
-    await createDatabaseTables(conn)
+    createDatabaseTables(conn)
 
-    await seedDatabase(conn)
+    seedDatabase(conn)
 
     logger("Setup successful", "info")
   } catch (error) {
@@ -46,7 +30,7 @@ async function createDatabaseTables(conn: mysql.Connection): Promise<void> {
     logger("Creating database tables", "info")
 
     logger(`Creating ${TableNames.TO_DO_ITEMS} table`, "info")
-    await conn.query(createToDoTable)
+    conn.query(createToDoTable)
 
     logger("Database tables successfully created", "info")
   } catch (error) {
@@ -67,7 +51,7 @@ async function seedDatabase(conn: mysql.Connection): Promise<void> {
     logger("Seeding database", "info")
 
     logger(`Seeding ${TableNames.TO_DO_ITEMS} table`, "info")
-    await conn.query(seedToDoTable)
+    conn.query(seedToDoTable)
 
     logger("Database successfully seeded", "info")
   } catch (error) {

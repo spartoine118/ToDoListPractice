@@ -4,89 +4,35 @@ import { ApolloServer } from "@apollo/server"
 import { resolvers } from "./graphql/resolvers"
 import { typeDefs } from "./graphql/schema"
 import { expressMiddleware } from "@apollo/server/express4"
-import { ToDoListAPI } from "./to-do-list-service/to-do-client"
+import { ToDoListAPI } from "./to-do-list-proxy/to-do-list-client/to-do-client"
 import { authenticationClient } from "./authentication-proxy/authentication-client/authentication-client"
-import { GraphQLError } from "graphql"
-import { logger, loggerExpressMiddleware } from "./logger/logger"
+import { loggerExpressMiddleware } from "./core/logger/logger"
 
-const port = 3000
+const port = process.env.SERVICE_PORT
 
 async function startApolloServer() {
   await server.start()
 
   app.use(loggerExpressMiddleware())
 
-  app.post(
-    "/login",
-    cors({ origin: "http://localhost:4200/login", credentials: true }),
-    express.json(),
-    async (req, res) => {
-      try {
-        const axiosRes = await authenticationClient.login(req.body)
-
-        logger(`Request Headers Origin: ${JSON.stringify(req.headers.origin)}`)
-
-        res
-          .header({
-            ...axiosRes.headers,
-            "Access-Control-Allow-Origin": req.headers["origin"],
-          })
-          .send(axiosRes.data)
-      } catch (error) {
-        logger(JSON.stringify(error), "error")
-
-        res
-          .header({ "Access-Control-Allow-Origin": req.headers["origin"] })
-          .send(error)
-      }
-    }
-  )
-
-  app.get(
-    "/logout",
-    cors({ origin: "http://localhost:4200/logout", credentials: true }),
-    express.json(),
-    async (req, res) => {
-      try {
-        const axiosRes = await authenticationClient.logout(req.headers.cookie)
-
-        res
-          .header({
-            ...axiosRes.headers,
-            "Access-Control-Allow-Origin": req.headers["origin"],
-          })
-          .send(axiosRes.data)
-      } catch (error) {
-        logger(JSON.stringify(error), "error")
-
-        res
-          .header({ "Access-Control-Allow-Origin": req.headers["origin"] })
-          .send(error)
-      }
-    }
-  )
-
   app.use(
     "/",
-    cors({ origin: "http://localhost:4200", credentials: true }),
+    cors({
+      origin: process.env.CLIENT_URI ?? "http://localhost:4200",
+      credentials: true,
+    }),
     express.json(),
     expressMiddleware(server, {
-      context: async ({ req }) => {
+      context: async ({ req, res }) => {
         const { cache } = server
-        const user = await authenticationClient.authenticate(req.headers.cookie)
-
-        if (!user)
-          throw new GraphQLError("User is not authenticated", {
-            extensions: {
-              code: "UNAUTHENTICATED",
-              http: { status: 401 },
-            },
-          })
 
         return {
-          user,
+          cookie: req.headers.cookie,
+          res,
+          user: null,
           dataSources: {
             toDoListAPI: new ToDoListAPI({ cache }),
+            authAPI: authenticationClient,
           },
         }
       },
@@ -100,6 +46,10 @@ async function startApolloServer() {
 
 export const app = express()
 
-const server = new ApolloServer({ typeDefs, resolvers })
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  status400ForVariableCoercionErrors: true,
+})
 
 startApolloServer()

@@ -63,6 +63,10 @@ services:
   api-gateway:
     ports:
       - "3000:3000"
+    environment:
+      - SERVICE_PORT=3000
+      - AUTH_SERVICE_URI=http://authentication:3002/auth
+      - TODO_SERVICE_URI=http://to-do-list:3001/to-do-list
     build: ./apps/api-gateway
 
 volumes:
