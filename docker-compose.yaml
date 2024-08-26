@@ -69,6 +69,11 @@ services:
       - TODO_SERVICE_URI=http://to-do-list:3001/to-do-list
     build: ./apps/api-gateway
 
+  redis:
+    image: redis:7.4.0-alpine
+    ports:
+      - "6379:6379"
+
 volumes:
   sql-volume:
   mongo-volumne:

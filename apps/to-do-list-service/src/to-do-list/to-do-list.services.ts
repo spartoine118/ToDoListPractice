@@ -4,6 +4,7 @@ import { logger } from "../core/logger/logger"
 import { WithUser } from "../core/interfaces"
 import { TableNames } from "../core/mysql-db/enums"
 import { dbConn } from "../core/mysql-db/db-conn"
+import { Message, redisPublisher } from "../redis/pubsub"
 
 export async function getToDoItemsByUserId(
   id: string
@@ -64,6 +65,13 @@ export async function updateToDoItemById({
         `Error while updating ${TableNames.TO_DO_ITEMS} id: ${updates.id}`
       )
     }
+
+    const message: Message = {
+      event: "UPDATE_TO_DO",
+      data: updates,
+    }
+
+    redisPublisher.publish(message, "authServiceChannel")
 
     return updates
   } catch (error) {
