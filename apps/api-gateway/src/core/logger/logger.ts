@@ -14,7 +14,9 @@ export const loggerExpressMiddleware = () => {
     const headers = req.rawHeaders
     const body = req.body
 
-    const message = `Method: ${method}, Path: ${path}, headers: ${headers}, body: ${body}`
+    const message = `Method: ${method}, Path: ${path}, headers: ${headers}, body: ${JSON.stringify(
+      body
+    )}`
 
     logger(message)
     next()

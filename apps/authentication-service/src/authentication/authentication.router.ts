@@ -2,14 +2,12 @@ import { Router } from "express"
 import jwt from "jsonwebtoken"
 import { authorizeCookieMiddleware } from "./authorization.middleware"
 import { mongoClient } from "./core/mongodb/db-connection"
-import { User } from "./core/interfaces"
+import { JWT, User } from "./core/interfaces"
 import { ObjectId } from "mongodb"
+import { CollectionName, DatabaseName } from "./core/mongodb/enums"
 
 export const authRouter = Router()
 
-interface JWT {
-  id: string
-}
 interface LoginPayload {
   email: string
   password: string
@@ -19,8 +17,8 @@ authRouter.post("/login", async (req, res) => {
   const data = req.body as LoginPayload
 
   const user = await mongoClient
-    .db("auth-db")
-    .collection<User>("user")
+    .db(DatabaseName.AUTH_DB)
+    .collection<User>(CollectionName.USER)
     .findOne(data)
 
   if (!user) {
@@ -30,7 +28,7 @@ authRouter.post("/login", async (req, res) => {
 
   const token = jwt.sign(
     JSON.stringify({ id: user._id.toString() }),
-    "SOME_SECRET_KEY"
+    process.env.SECRET ?? "SOME_SECRET"
   )
 
   res
@@ -42,28 +40,20 @@ authRouter.post("/login", async (req, res) => {
     .send(user)
 })
 
-authRouter.get("/authenticate", async (req, res) => {
-  console.log("In authentication service /authenticate route")
-  console.log(req.headers)
-  console.log(req.cookies)
-
+authRouter.get("/authenticate", authorizeCookieMiddleware, async (req, res) => {
   const token = req.cookies.JWT
-
-  console.log(token)
-
-  if (!token) {
-    res.status(401).send([{ message: "UNAUTHORIZED" }])
-    return
-  }
 
   const decrypt = jwt.decode(token) as JWT
 
-  console.log(decrypt)
-
   const user = await mongoClient
-    .db("auth-db")
-    .collection<User>("user")
+    .db(DatabaseName.AUTH_DB)
+    .collection<User>(CollectionName.USER)
     .findOne({ _id: new ObjectId(decrypt.id) })
+
+  if (!user) {
+    res.status(404).send([{ message: "User not found" }])
+    return
+  }
 
   res.send(user)
 })

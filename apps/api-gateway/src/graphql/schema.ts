@@ -21,6 +21,7 @@ export const typeDefs = gql`
   type Query {
     toDoItem(id: ID!): ToDoItem
     toDoItems: [ToDoItem!]!
+    toDoItemsByUser: [ToDoItem!]!
   }
 
   input UpdateToDoItem {
@@ -29,7 +30,21 @@ export const typeDefs = gql`
     complete: Boolean!
   }
 
+  type MutationSuccess {
+    id: ID
+    success: Boolean!
+  }
+
+  input LoginCredentials {
+    email: String
+    password: String
+  }
+
   type Mutation {
     updateToDoItem(item: UpdateToDoItem!): ToDoItem
+    deleteToDoItem(id: ID!): MutationSuccess
+    login(credentials: LoginCredentials!): User
+    logout: MutationSuccess
+    authenticate: User
   }
 `

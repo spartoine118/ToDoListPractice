@@ -11,6 +11,7 @@ export class AuthenticationClient {
     return response
   }
 
+  // TODO figure out what type the cookies are
   async authenticate(cookie: any): Promise<User> {
     const { data } = await this.http.get<User>("/authenticate", {
       headers: { cookie },
@@ -19,16 +20,15 @@ export class AuthenticationClient {
     return data
   }
 
-  async logout(headers: any) {
-    const data = await this.http.get("/logout", { headers })
+  async logout(cookie: any) {
+    const data = await this.http.get("/logout", { headers: { cookie } })
 
     return data
   }
 }
 
 const instance = axios.create({
-  // TODO Change this to an env var later
-  baseURL: "http://authentication:3002/auth",
+  baseURL: process.env.AUTH_SERVICE_URI,
   withCredentials: true,
 })
 

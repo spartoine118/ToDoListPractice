@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import jwt, { JwtPayload } from "jsonwebtoken"
-import { logger } from "./core/logger/logger"
+import { decodeJWT } from "./core/utils/decode-token"
 
 export async function authorizedBearerMiddleware(
   req: Request,
@@ -12,10 +11,6 @@ export async function authorizedBearerMiddleware(
   if (!token) {
     res.status(401).send([{ message: "UNAUTHORIZED" }])
     return
-  }
-
-  if (token) {
-    console.log(JSON.stringify(token))
   }
 
   next()
@@ -33,9 +28,11 @@ export async function authorizeCookieMiddleware(
     return
   }
 
-  if (token) {
-    const decrypt = jwt.decode(token) as JwtPayload
-    logger(JSON.stringify(decrypt), "info")
+  const valid = decodeJWT(token)
+
+  if (!valid) {
+    res.status(401).send([{ message: "UNAUTHORIZED" }])
+    return
   }
 
   next()

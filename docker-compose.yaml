@@ -10,8 +10,14 @@ services:
     build: ./apps/to-do-list-service/
     ports:
       - "3001:3001"
+    environment:
+      - DB_PORT=3306
+      - DB_PASSWORD=root
+      - DB_USERNAME=root
+      - SERVICE_PORT=3001
     depends_on:
-      - to-do-list-db
+      to-do-list-db:
+        condition: service_healthy
     
 
   to-do-list-db:
@@ -23,11 +29,23 @@ services:
       - 3306:3306
     volumes:
       - sql-volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin -u root -proot ping"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   authentication:
     build: './apps/authentication-service/'
     ports:
       - "3002:3002"
+    environment:
+      - SERVICE_PORT=3002
+      - DB_PORT=27017
+      - DB_PASSWORD=root
+      - DB_USERNAME=root
+      - API_GATEWAY_URI=http://localhost:3000/
     depends_on:
       - authentication-db
 
@@ -45,6 +63,10 @@ services:
   api-gateway:
     ports:
       - "3000:3000"
+    environment:
+      - SERVICE_PORT=3000
+      - AUTH_SERVICE_URI=http://authentication:3002/auth
+      - TODO_SERVICE_URI=http://to-do-list:3001/to-do-list
     build: ./apps/api-gateway
 
 volumes:
