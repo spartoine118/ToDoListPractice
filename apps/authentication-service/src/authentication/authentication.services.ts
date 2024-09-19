@@ -1,3 +1,4 @@
+import { RedisEvent } from "./core/interfaces"
 import { logger } from "./core/logger/logger"
 
 interface DummyTestProps {
@@ -6,7 +7,8 @@ interface DummyTestProps {
   complete: boolean
 }
 
-export function dummyTest({ id, name, complete }: DummyTestProps) {
+export function dummyTest({ message }: RedisEvent) {
+  const { id, name, complete } = JSON.parse(message) as DummyTestProps
   logger(
     `Received an event for dummy test function with data: ${id} ${name} ${complete}`
   )

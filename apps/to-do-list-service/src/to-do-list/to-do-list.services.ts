@@ -12,7 +12,7 @@ export async function getToDoItemsByUserId(
   try {
     const conn = await dbConn.getConnection()
 
-    const query = `SELECT * FROM to_do_items WHERE userId = "${id}";`
+    const query = `SELECT * FROM ${TableNames.TO_DO_ITEMS} WHERE userId = "${id}";`
 
     const results = await conn.query<RowDataPacket[]>(query)
 
@@ -70,8 +70,11 @@ export async function updateToDoItemById({
       event: "UPDATE_TO_DO",
       data: updates,
     }
-
-    redisPublisher.publish(message, "authServiceChannel")
+    redisPublisher.publish({
+      channel: "authServiceChannel",
+      message: JSON.stringify(message),
+      type: "TEST_EVENT",
+    })
 
     return updates
   } catch (error) {
