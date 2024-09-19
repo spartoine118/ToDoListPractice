@@ -25,12 +25,22 @@ const createToDoTable = `CREATE TABLE ${TableNames.TO_DO_ITEMS} (
   userId VARCHAR(255) NOT NULL
 );`
 
+const createEventTable = `CREATE TABLE ${TableNames.EVENTS} (
+  _id VARCHAR(255) PRIMARY KEY,
+  requestChannel VARCHAR(255) NOT NULL,
+  replyChannel VARCHAR(255) NOT NULL,
+  type VARCHAR(255) NOT NULL,
+  message VARCHAR(255) NOT NULL,
+  ack BOOLEAN NOT NULL
+);`
+
 async function createDatabaseTables(conn: mysql.Connection): Promise<void> {
   try {
     logger("Creating database tables", "info")
 
     logger(`Creating ${TableNames.TO_DO_ITEMS} table`, "info")
     conn.query(createToDoTable)
+    conn.query(createEventTable)
 
     logger("Database tables successfully created", "info")
   } catch (error) {

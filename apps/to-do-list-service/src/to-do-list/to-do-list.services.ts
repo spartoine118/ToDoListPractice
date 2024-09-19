@@ -4,6 +4,7 @@ import { logger } from "../core/logger/logger"
 import { WithUser } from "../core/interfaces"
 import { TableNames } from "../core/mysql-db/enums"
 import { dbConn } from "../core/mysql-db/db-conn"
+import { Message, redisPublisher } from "../redis/pubsub"
 
 export async function getToDoItemsByUserId(
   id: string
@@ -11,7 +12,7 @@ export async function getToDoItemsByUserId(
   try {
     const conn = await dbConn.getConnection()
 
-    const query = `SELECT * FROM to_do_items WHERE userId = "${id}";`
+    const query = `SELECT * FROM ${TableNames.TO_DO_ITEMS} WHERE userId = "${id}";`
 
     const results = await conn.query<RowDataPacket[]>(query)
 
@@ -64,6 +65,16 @@ export async function updateToDoItemById({
         `Error while updating ${TableNames.TO_DO_ITEMS} id: ${updates.id}`
       )
     }
+
+    const message: Message = {
+      event: "UPDATE_TO_DO",
+      data: updates,
+    }
+    redisPublisher.publish({
+      channel: "authServiceChannel",
+      message: JSON.stringify(message),
+      type: "TEST_EVENT",
+    })
 
     return updates
   } catch (error) {

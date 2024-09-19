@@ -48,7 +48,7 @@ authRouter.get("/authenticate", authorizeCookieMiddleware, async (req, res) => {
   const user = await mongoClient
     .db(DatabaseName.AUTH_DB)
     .collection<User>(CollectionName.USER)
-    .findOne({ _id: new ObjectId(decrypt.id) })
+    .findOne({ _id: decrypt.id })
 
   if (!user) {
     res.status(404).send([{ message: "User not found" }])
